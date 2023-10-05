@@ -1,18 +1,23 @@
 import asyncio
 import aiohttp
 from typing import List, Tuple
+import time
+import logging
 
 
 class RateLimiter:
-    def __init__(self, rate: int, burst: int):
+    def __init__(self, rate: int, burst: int, verbose: bool = False):
         """Token bucket rate limiter"""
         self.rate = rate
         self.burst = burst
         self.tokens = burst
-        self.last_refill_time = asyncio.get_event_loop().time()
+        self.last_refill_time = time.time() # init synchronously to avoid `no event loop running` error
+        self.verbose = verbose
 
     async def acquire(self):
         """Acquire a token, blocking if necessary"""
+        if self.verbose: logging.info(f'Acquiring token: {self.tokens} available')
+
         while self.tokens < 1:
             await self._refill()
             await asyncio.sleep(0.1) # sleep to avoid busy waiting
@@ -20,6 +25,8 @@ class RateLimiter:
 
     async def _refill(self):
         """Refills bucket based on rate"""
+        if self.verbose: logging.info(f'Refilling token bucket: {self.tokens} available')
+
         current_time = asyncio.get_event_loop().time() # get current time
         elapsed_time = current_time - self.last_refill_time # calculate elapsed time
         new_tokens = elapsed_time * self.rate # calculate new tokens
@@ -35,8 +42,8 @@ class HttpRequestFetcher:
         self.session = None
     
     # context manager
-    async def aenter(self): self.session = aiohttp.ClientSession()
-    async def aexit(self, exc_type, exc, tb): await self.close()
+    async def __aenter__(self): self.session = aiohttp.ClientSession()
+    async def __aexit__(self, exc_type, exc, tb): await self.session.close()
 
     async def fetch(self, url: str):
         """Fetches url and returns response text"""
@@ -63,7 +70,7 @@ class BatchRequestExecutor:
         """Executes batch requests and returns successful and failed urls"""
         async with fetcher:
             sem = asyncio.Semaphore(self.concurrency_limit) # create semaphore to control batch size (or concurrency)
-            tasks = [self._fetch(sem, url) for url in urls] # create tasks
+            tasks = [self._fetch(sem, url, fetcher) for url in urls] # create tasks
             results = await asyncio.gather(*tasks, return_exceptions=True) # gather results
             successful_urls = [result for result in results if not isinstance(result, Exception)] # filter out exceptions
             failed_urls = [urls[i] for i, result in enumerate(results) if isinstance(result, Exception)] # collect failed urls
