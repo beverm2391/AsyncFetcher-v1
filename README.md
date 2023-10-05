@@ -1,17 +1,6 @@
-I built this so that I could fetch multiple years of intraday data from [polygon](https://polygon.io/) from all 503 stocks in the S&P 500.
+This is my asynchronous fetcher with rate limiting. It's a work in progress - I'm primarily using it to fetch large amounts of stock data form polygon.io without pagination. If i need 20k results and the pagination limit is 1k, thats 20 separate, synchronous API calls - at 2s/call thats a minimum of 40s. Instead, I can make 20 asynchronous calls at once and get the data in 2s. Now scale that up to 800ish results per call (minute data for a day for one ticker) * 252 trading days a year * 10 years * 503 stocks in the S&P 500 = 1267560 API calls. With pagination (assuming 2s per call) that would amount to 704.2 hours. (This is assuming that all 503 stocks have been listed for 10 years, which is not true), but you get the idea of an IO bound process.
 
-Since polygon:
- - limits the results per request
- - paginates the results that it does return
-
-Since this task is ultimately I/O bound, I figured the fastest way would be to avoid any paginated results and instead send a bunch of async requests.
-
-I ended up making 1 request per stock per day, and then aggregating the results into a single CSV file per stock.
-
-For 503 stocks (S&P 500) over 5 years (~252 * 5 = 1260 trading days), this ended up being 503 * 1260 = ~634k requests.
-
-I needed a way to handle errors, missing data, rate limits, and any other issues that might arise. Thus I made this fetcher. 
-
-This repo only includes the code for the fetcher itself, not the code used to generate the req urls or the code used to aggregate the results.
-
-This code is not perfect - but it did the job for me.
+## TODO 
+- [ ] fix rate limiter and get test passing
+- [ ] add options for parsing responses (whatever i need for polygon)
+- [ ] fetch a bunch of stock data 
