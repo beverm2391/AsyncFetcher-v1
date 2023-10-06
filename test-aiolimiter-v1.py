@@ -3,7 +3,7 @@ from aiolimiter import AsyncLimiter
 import pytest
 
 
-def main():
+async def test():
     limiter = AsyncLimiter(4, 8)
 
     async def _task(id):
@@ -12,7 +12,11 @@ def main():
             print(f'{id:>2d}: Drip! {time.time() - ref:>5.2f}s')
 
     tasks = [_task(i) for i in range(10)]
-    ref = time.time(); result = asyncio.run(asyncio.wait(tasks)) 
+    # ref = time.time(); result = asyncio.run(asyncio.wait(tasks)) 
+    ref = time.time(); results = await asyncio.gather(*tasks)
+
+def main():
+    asyncio.run(test())
 
 if __name__ == "__main__":
     main()
