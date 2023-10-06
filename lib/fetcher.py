@@ -34,8 +34,13 @@ class HttpRequestFetcher:
 class BatchRequestExecutor:
     def __init__(self) -> None: pass
 
+    def _validate_urls(self, urls):
+        assert isinstance(urls, list), f"urls must be a list, is {type(urls)}"
+        assert isinstance(urls[0], str), f"urls must be a list of strings, is list of {type(urls[0])}s"
+
     async def _execute(self, urls, fetcher: HttpRequestFetcher):
         """Use asyncio.run() to execute"""
+        self._validate_urls(urls) # validate urls
         async with fetcher: # context manager, init aiohttp session
             tasks = [fetcher.fetch(url, ref=time.time()) for url in urls] # create tasks
             return await asyncio.gather(*tasks) # returns gathered results
