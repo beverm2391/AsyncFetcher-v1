@@ -2,7 +2,7 @@ from aiolimiter import AsyncLimiter
 import aiohttp
 import asyncio
 import time
-from typing import List
+from typing import List, Callable, Optional
 
 class HttpRequestFetcher:
     def __init__(self, retries: int = 2, rps: int = 2):
@@ -14,15 +14,17 @@ class HttpRequestFetcher:
     async def __aenter__(self): self.session = aiohttp.ClientSession()
     async def __aexit__(self, exc_type, exc, tb): await self.session.close()
 
-    async def fetch(self, url: str, ref=time.time()):
+    async def fetch(self, url: str, ref=time.time(), parse=True):
         for attempt in range(self.retries + 1):
             async with self.limiter:
                 print(f'Request! {time.time() - ref:>5.2f}s')
                 try:
                     async with self.session.get(url) as response:
                         response.raise_for_status()
-                        
-                        return await response.text()
+                        if parse:
+                            return await ResponseParser().parse(response)
+                        else:
+                            return response
                 except aiohttp.ClientError as e:
                     if attempt == self.retries:
                         print(f"Failed to fetch {url}: {e}") # print error
@@ -43,3 +45,28 @@ class BatchRequestExecutor:
         """Use BatchRequestExecutor().execute() to execute"""
         loop = loop or asyncio.get_event_loop() # get event loop if not provided, else use provided
         return loop.run_until_complete(self._execute(urls, fetcher)) # run until complete
+
+
+class ResponseParser:
+    def __init__(self):
+        self.parsers = {
+            'text/html': self._html,
+            'application/json': self._json,
+            'application/xml': self._xml,
+            'text/plain': self._text,
+        }
+
+    async def _json(self, response): return await response.json()
+    async def _text(self, response): return await response.text()
+    async def _html(self, response): return await self._text(response)
+    async def _xml(self, response): return await self._text(response)
+    async def parse(self, response):
+        if not hasattr(response, 'headers'):
+            raise ValueError("Response object has no headers attribute")
+    
+        content_type = response.headers.get('Content-Type', '').split(';')[0]
+        parser = self.parsers.get(content_type, None)
+        if parser is None:
+            raise ValueError(f"No parser available for content type {content_type}")
+
+        return await parser(response)

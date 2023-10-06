@@ -2,7 +2,9 @@ This is my asynchronous fetcher with rate limiting. It's a work in progress - I'
 
 ## Completed
 - [X] fix rate limiter and get test passing
+- [X] add options for parsing responses (whatever i need for polygon)
+- [X] add tests for parsing responses
 
 ## TODO 
-- [ ] add options for parsing responses (whatever i need for polygon)
+
 - [ ] fetch a bunch of stock data
