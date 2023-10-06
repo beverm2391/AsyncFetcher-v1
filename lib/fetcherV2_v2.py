@@ -5,18 +5,16 @@ import time
 from typing import List
 
 class HttpRequestFetcher:
-    def __init__(self, retries: int = 2, rps: int = 10, burst: int = 20):
+    def __init__(self, retries: int = 2, rps: int = 2):
         """Fetcher with specified rate limiter and number of retries"""
-        self.limiter = AsyncLimiter(rps, burst)
+        self.limiter = AsyncLimiter(rps, time_period=1) # per second
         self.retries = retries
         self.session = None
 
-    # context manager
     async def __aenter__(self): self.session = aiohttp.ClientSession()
     async def __aexit__(self, exc_type, exc, tb): await self.session.close()
 
-
-    async def fetch(self, url: str):
+    async def fetch(self, url: str, ref=time.time()):
         for attempt in range(self.retries + 1):
             async with self.limiter:
                 print(f'Request! {time.time() - ref:>5.2f}s')
@@ -33,11 +31,18 @@ class HttpRequestFetcher:
                     await asyncio.sleep(backoff_duration)
 
 class BatchRequestExecutor:
+    def __init__(self) -> None: pass
     async def _execute(self, urls, fetcher: HttpRequestFetcher):
-        tasks = [fetcher.fetch(url) for url in urls]
-        global ref; ref = time.time() # set reference time
-        return await asyncio.gather(*tasks) # returns gathered results
+        """Use asyncio.run() to execute"""
+        async with fetcher: # context manager, init aiohttp session
+            tasks = [fetcher.fetch(url, ref=time.time()) for url in urls] # create tasks
+            return await asyncio.gather(*tasks) # returns gathered results
     
-    @staticmethod
-    def execute(self, fetcher: HttpRequestFetcher):
-        return asyncio.run(self._execute(fetcher))
+    # def execute(self, urls, fetcher: HttpRequestFetcher):
+    #     """Use BatchRequestExecutor().execute() to execute"""
+    #     return asyncio.run(self._execute(urls, fetcher))
+    
+    def execute(self, urls, fetcher: HttpRequestFetcher, loop: asyncio.AbstractEventLoop = None):
+        """Use BatchRequestExecutor().execute() to execute"""
+        loop = loop or asyncio.get_event_loop() # get event loop if not provided
+        return loop.run_until_complete(self._execute(urls, fetcher))
