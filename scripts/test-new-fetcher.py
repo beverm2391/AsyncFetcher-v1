@@ -2,7 +2,7 @@ import asyncio
 import time
 from time import perf_counter
 
-from lib.fetcherV2_v2 import HttpRequestFetcher, BatchRequestExecutor
+from lib.fetcher import HttpRequestFetcher, BatchRequestExecutor
 
 def main():
     rps = 1

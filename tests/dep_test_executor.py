@@ -2,7 +2,7 @@ import pytest
 from time import perf_counter
 import asyncio
 
-from lib.fetcherV2 import HttpRequestFetcher, RateLimiter, BatchRequestExecutor
+from lib.deprecated.fetcherV2 import HttpRequestFetcher, RateLimiter, BatchRequestExecutor
 
 # Make fixtures
 @pytest.fixture
