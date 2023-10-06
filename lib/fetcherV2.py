@@ -2,7 +2,7 @@ import asyncio
 import aiohttp
 from typing import List, Tuple
 import time
-import logging
+import math
 
 
 class RateLimiter:
@@ -11,26 +11,33 @@ class RateLimiter:
         self.rate = rate
         self.burst = burst
         self.tokens = burst
-        self.last_refill_time = time.time() # init synchronously to avoid `no event loop running` error
+        self.last_refill_time = None
         self.verbose = verbose
 
     async def acquire(self):
         """Acquire a token, blocking if necessary"""
-        if self.verbose: logging.info(f'Acquiring token: {self.tokens} available')
+        if self.verbose: print(f'Acquiring token: {self.tokens} available')
 
-        while self.tokens < 1:
+        while self.tokens < 1: 
             await self._refill()
             await asyncio.sleep(0.1) # sleep to avoid busy waiting
         self.tokens -= 1
 
     async def _refill(self):
         """Refills bucket based on rate"""
-        if self.verbose: logging.info(f'Refilling token bucket: {self.tokens} available')
+        if self.verbose: print(f'Refilling token bucket: {self.tokens} available')
 
-        current_time = asyncio.get_event_loop().time() # get current time
+        current_time = time.monotonic() # get current time
+        if self.last_refill_time is None: self.last_refill_time = current_time
+
+        # if self.verbose: print(f"Current time: {current_time}")
         elapsed_time = current_time - self.last_refill_time # calculate elapsed time
-        new_tokens = elapsed_time * self.rate # calculate new tokens
-        self.tokens = min(self.tokens + new_tokens, self.burst) # add new tokens to bucket
+        
+        assert elapsed_time >= 0, f"Elapsed time is negative: {elapsed_time}"
+
+        if self.verbose: print(f"Calculating elapsed time: {elapsed_time:0.3f}, rate: {self.rate}")
+        new_tokens = math.ceil(elapsed_time * self.rate) # calculate new tokens, make sure to floor to int
+        self.tokens = min(self.tokens + new_tokens, self.burst) # add new tokens to bucket ensuring we don't exceed burst OR rate
         self.last_refill_time = current_time # update last refil time
 
 

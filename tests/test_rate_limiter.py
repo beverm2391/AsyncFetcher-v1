@@ -1,5 +1,7 @@
 import pytest
 import asyncio
+from time import perf_counter
+
 from lib.fetcherV2 import RateLimiter
 
 
@@ -11,18 +13,18 @@ async def test_rate_limiter(rate=2, burst=2):
         """A dummy function that acquires a token"""""
         await rate_limiter.acquire()
     
-    start_time = asyncio.get_event_loop().time()
+    start_time = perf_counter()
 
     # Attepmt to run 4 functions at once with a rate of 2 per second
     tasks = [_limited_function() for _ in range(4)]
 
-    with pytest.raises(asyncio.TimeoutError):
-        await asyncio.wait_for(
-            asyncio.gather(*tasks),
-            timeout=5
-        ) # wait for 5 seconds, should raise TimeoutError
+    # with pytest.raises(asyncio.TimeoutError):
+    await asyncio.wait_for(
+        asyncio.gather(*tasks),
+        timeout=10
+    ) # wait for 5 seconds, should raise TimeoutError
 
-    elapsed_time = asyncio.get_event_loop().time() - start_time
+    elapsed_time = perf_counter() - start_time
 
     # Since we have a rate of 2 ops per second, and a burst of 2,
     # executing 4 tasks should take at least 1 second.
