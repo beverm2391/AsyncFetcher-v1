@@ -28,3 +28,7 @@ def test_fetcher_and_executor():
     assert elapsed >= rps / n_requests, f"Expected elapsed time to be at least {(n_requests / rps) - 1}s, got {elapsed:0.2f}"
     #? max time should be n_requests / rps - 1s, since we start the first request immediately at 0s, and the last request at n_requests / rps - 1s
     # print(responses[0])
+
+    invalid_data_type = [["https://www.google.com"]] # invalid data type, list of lists
+    with pytest.raises(AssertionError):
+        responses = executor.execute(invalid_data_type, fetcher)
