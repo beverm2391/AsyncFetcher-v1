@@ -12,6 +12,6 @@ async def test_aiolimiter():
         async with limiter:
             print(f'{id:>2d}: Drip! {time.time() - ref:>5.2f}s')
 
-    tasks = [_task(i) for i in range(10)]
+    tasks = [_task(i) for i in range(3)]
     # ref = time.time(); result = asyncio.run(asyncio.wait(tasks)) 
     ref = time.time(); results = await asyncio.gather(*tasks)

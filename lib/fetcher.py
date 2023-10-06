@@ -32,17 +32,14 @@ class HttpRequestFetcher:
 
 class BatchRequestExecutor:
     def __init__(self) -> None: pass
+
     async def _execute(self, urls, fetcher: HttpRequestFetcher):
         """Use asyncio.run() to execute"""
         async with fetcher: # context manager, init aiohttp session
             tasks = [fetcher.fetch(url, ref=time.time()) for url in urls] # create tasks
             return await asyncio.gather(*tasks) # returns gathered results
-    
-    # def execute(self, urls, fetcher: HttpRequestFetcher):
-    #     """Use BatchRequestExecutor().execute() to execute"""
-    #     return asyncio.run(self._execute(urls, fetcher))
-    
+
     def execute(self, urls, fetcher: HttpRequestFetcher, loop: asyncio.AbstractEventLoop = None):
         """Use BatchRequestExecutor().execute() to execute"""
-        loop = loop or asyncio.get_event_loop() # get event loop if not provided
-        return loop.run_until_complete(self._execute(urls, fetcher))
+        loop = loop or asyncio.get_event_loop() # get event loop if not provided, else use provided
+        return loop.run_until_complete(self._execute(urls, fetcher)) # run until complete
