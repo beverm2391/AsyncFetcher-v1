@@ -2,7 +2,8 @@ import asyncio, time
 from aiolimiter import AsyncLimiter
 import pytest
 
-def test_aiolimiter():
+@pytest.mark.asyncio
+async def test_aiolimiter():
     limiter = AsyncLimiter(4, 8)
 
     @pytest.mark.asyncio
@@ -12,4 +13,5 @@ def test_aiolimiter():
             print(f'{id:>2d}: Drip! {time.time() - ref:>5.2f}s')
 
     tasks = [_task(i) for i in range(10)]
-    ref = time.time(); result = asyncio.run(asyncio.wait(tasks)) 
+    # ref = time.time(); result = asyncio.run(asyncio.wait(tasks)) 
+    ref = time.time(); results = await asyncio.gather(*tasks)
