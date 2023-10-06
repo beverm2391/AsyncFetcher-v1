@@ -2,7 +2,6 @@ from aiolimiter import AsyncLimiter
 import aiohttp
 import asyncio
 import time
-from typing import List, Callable, Optional
 
 class HttpRequestFetcher:
     def __init__(self, retries: int = 2, rps: int = 2):
