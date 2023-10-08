@@ -8,4 +8,5 @@ This is my asynchronous fetcher with rate limiting. It's a work in progress - I'
 ## TODO 
 
 - [ ] figure out whats wrong with  my code in `polygon_v1.ipynb` notebook - when passing in a list of 1 ticker it outputs 4 lists of urls - might be the list comp
-- [ ] fetch a bunch of stock data
+- [ ] fetch 5 years worth of minute data for the 93 stocks
+- [ ] use that data to replicate the results of the paper
