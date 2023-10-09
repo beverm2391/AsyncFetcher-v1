@@ -5,10 +5,10 @@ This is my asynchronous fetcher with rate limiting. It's a work in progress - I'
 - [X] add options for parsing responses (whatever i need for polygon)
 - [X] add tests for parsing responses
 - [X] figure out whats wrong with  my code in `polygon_v1.ipynb` notebook - when passing in a list of 1 ticker it outputs 4 lists of urls - might be the list comp
+- [X] get the fetcher working in notebook
 
 ## TODO 
-
-- [ ] get the fetcher working in notebook
+- [ ] create some sort of schema for the polygon response
 - [ ] move url generation logic to library, write unit tests
 - [ ] fetch 5 years worth of minute data for the 93 stocks (07-01-2011 - 06-30-2021)
 - [ ] use that data to replicate the results of the paper
