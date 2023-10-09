@@ -4,11 +4,12 @@ import asyncio
 import time
 
 class HttpRequestFetcher:
-    def __init__(self, retries: int = 2, rps: int = 2):
+    def __init__(self, retries: int = 2, rps: int = 2, detailed_logs=False):
         """Fetcher with specified rate limiter and number of retries"""
         self.limiter = AsyncLimiter(rps, time_period=1) # per second
         self.retries = retries
         self.session = None
+        self.detailed_logs = detailed_logs
 
     async def __aenter__(self): self.session = aiohttp.ClientSession()
     async def __aexit__(self, exc_type, exc, tb): await self.session.close()
@@ -28,6 +29,8 @@ class HttpRequestFetcher:
                     if attempt == self.retries:
                         print(f"Failed to fetch {url}: {e}") # print error
                         return None
+                    elif self.detailed_logs is True:
+                        print(f"Failed to fetch {url}: {e} - retrying... attepmpt: {attempt + 1} of max: {self.retries + 1}")
                     backoff_duration = 2 ** attempt # exponential backoff
                     await asyncio.sleep(backoff_duration)
 
