@@ -8,5 +8,7 @@ This is my asynchronous fetcher with rate limiting. It's a work in progress - I'
 
 ## TODO 
 
+- [ ] get the fetcher working in notebook
+- [ ] move url generation logic to library, write unit tests
 - [ ] fetch 5 years worth of minute data for the 93 stocks (07-01-2011 - 06-30-2021)
 - [ ] use that data to replicate the results of the paper
