@@ -12,7 +12,7 @@ def get_polygon_root() -> str:
 def get_polygon_key():
     didload = load_dotenv()
     assert didload, "Failed to load .env file"
-    return os.getenv("POLYGON_KEY")
+    return os.getenv("POLYGON_API_KEY")
 
 #! Data ======================================================================
 @lru_cache  # cache the result of this function to avoid refetching
