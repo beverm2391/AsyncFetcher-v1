@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import List, Optional
+from pydantic import BaseModel, validator
+from typing import List, Optional, Union
 
 class Result(BaseModel):
     c: float
@@ -8,7 +8,7 @@ class Result(BaseModel):
     n: int
     o: float
     t: int
-    v: int
+    v: Union[int, float] # ! I had to change this to Union[int, float] because the API returns a float for GE only, but an int for all other tickers
     vw: float
 
 class Snapshot(BaseModel):

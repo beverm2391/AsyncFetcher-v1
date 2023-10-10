@@ -1,3 +1,5 @@
+# This script is good for fetching, though it doens't save the data incrementally, so if theres an error or you want to pause, you cant. Fixing that in the next version.
+
 import pandas as pd
 from typing import List, Dict
 from time import perf_counter
@@ -51,7 +53,7 @@ def main():
     # TODO setup argparse
 
     # tickers_ = tickers[:20]
-    tickers_ = 'AAPL'
+    tickers_ = 'GE'
     start_date = '2018-10-11'
     # start_date = '2023-09-09' # test date
     end_date = '2023-10-09'
@@ -59,7 +61,7 @@ def main():
     tups = get_nyse_date_tups(start_date, end_date, unix=True) # get tups of open/close, unix
     urls = make_urls(tickers_, tups, api_key) # make urls
 
-    REQUESTS_PER_SECOND = 500
+    REQUESTS_PER_SECOND = 100
 
     fetcher = HttpRequestFetcher(rps=REQUESTS_PER_SECOND, detailed_logs=True) # setup fetcher
     executor = BatchRequestExecutor() # setup executor

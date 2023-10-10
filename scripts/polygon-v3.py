@@ -41,7 +41,7 @@ def save_invalidated_results(invalidated_results: List[Dict], base_path=get_poly
     with open(f"{base_path}/invalidated_run_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pkl", 'wb') as f:
         pickle.dump(invalidated_results, f)
 
-def process_results(results, start_date, end_date):
+def process_results(results, start_date, end_date, save_dir):
     """Function to process results and save to csvs"""
 
     validated, invalidated = validate_results(results) # validate
@@ -58,8 +58,6 @@ def process_results(results, start_date, end_date):
         
         # save to csv
         print("Saving validated data...")
-
-        save_dir = "/Users/beneverman/Documents/Coding/AsyncFetcher-v1/data/tests"
         save_tickers(df, start_date, end_date, base_path=save_dir)
     else:
         print("No validated results to save. RIP :(")
@@ -78,15 +76,17 @@ def main():
     api_key = get_polygon_key()
     tickers = get_93()
 
-    tickers_ = tickers
+    tickers_ = tickers[40:]
     start_date = '2018-10-11'
     end_date = '2023-10-09'
+
+    SAVE_DIR = "/Users/beneverman/Documents/Coding/AsyncFetcher-v1/data/"
 
     REQUESTS_PER_SECOND = 100
 
     tups = get_nyse_date_tups(start_date, end_date, unix=True) # get tups of open/close, unix
 
-    for idx, ticker in enumerate(tickers): # iterate over tickers
+    for idx, ticker in enumerate(tickers_): # iterate over tickers
         print(f"Processing {ticker}... {idx + 1} of {len(tickers)}")
 
         urls = make_urls(ticker, tups, api_key) # make urls
@@ -101,7 +101,8 @@ def main():
 
         print(f"Data fetching complete. Time elapsed: {fetch_elapsed:0.2f} seconds")
         print("Validating and parsing data...")
-        process_results(results, start_date, end_date)
+
+        process_results(results, start_date, end_date, SAVE_DIR)
 
     main_elapsed = perf_counter() - main_start
     print(f"Total time elapsed: {main_elapsed:0.2f} seconds")
