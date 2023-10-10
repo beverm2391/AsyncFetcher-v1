@@ -16,10 +16,9 @@ Did a successful run with AAPL. Fetched, validated, parsed, and saved 5 years of
 - [X] write fetcher script from `polygon_v1.ipynb` notebook
   - [X] sanity check the data
 - [X] do some *light* stress testing of polygon API??
-
+- [X] make new script to do one ticker at a time, aggregate, and write to csv, so that if something breaks I don't lose everything 
+- [X] fetch 5 years worth of minute data for the 93 stocks (07-01-2011 - 06-30-2021)
+- 
 ## TODO 
-- [ ] make new script to do one ticker at a time, aggregate, and write to csv, so that if something breaks I don't lose everything (start by testing 10-20 tickers with 1 months of data each)
-- [ ] fetch 5 years worth of minute data for the 93 stocks (07-01-2011 - 06-30-2021)
 - [ ] add tqdm or something to show progress and overall rate metrics?
-- [ ] improve the fetcher where you can cancel a run and still have the data you've fetched so far
-- [ ] use that data to replicate the results of the paper
+- [ ] improve the fetcher where you can cancel a run and still have the data you've fetched so far (like a cache?)
