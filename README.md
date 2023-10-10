@@ -13,6 +13,7 @@ This is my asynchronous fetcher with rate limiting. It's a work in progress - I'
 
 ## TODO 
 - [ ] write fetcher script from `polygon_v1.ipynb` notebook
+  - [ ] do one ticker at a time, aggregate, and write to csv, so that if something breaks I don't lose everything
 - [ ] do some *light* stress testing of polygon API??
 - [ ] fetch 5 years worth of minute data for the 93 stocks (07-01-2011 - 06-30-2021)
 - [ ] add tqdm or something to show progress and overall rate metrics?

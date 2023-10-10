@@ -27,10 +27,10 @@ class HttpRequestFetcher:
                             return response
                 except aiohttp.ClientError as e:
                     if attempt == self.retries:
-                        print(f"Failed to fetch {url}: {e}") # print error
+                        print(f"Failed to fetch {url}. Error: {e}") # print error
                         return None
                     elif self.detailed_logs is True:
-                        print(f"Failed to fetch {url}: {e} - retrying... attepmpt: {attempt + 1} of max: {self.retries + 1}")
+                        print(f"Failed to fetch {url}. Error: {e} - retrying... attepmpt: {attempt + 1} of max: {self.retries + 1}")
                     backoff_duration = 2 ** attempt # exponential backoff
                     await asyncio.sleep(backoff_duration)
 
