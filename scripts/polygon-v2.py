@@ -60,13 +60,14 @@ def main():
     executor = BatchRequestExecutor() # setup executor
 
     print("Starting execution...")
-    estimate_time(urls, rps=REQUESTS_PER_SECOND) # estimate time and print
+    estimate_time(len(urls), rps=REQUESTS_PER_SECOND) # estimate time and print
     fetch_start = perf_counter() # start timer
 
     results = executor.execute(urls, fetcher) # execute
     fetch_elapsed = perf_counter() - fetch_start # end timer
     print(f"Data fetching complete. Time elapsed: {fetch_elapsed:0.2f} seconds")
     print("Validating and parsing data...")
+
     validated = [Snapshot(**result) for result in results] # validate
 
     # load into dataframe
@@ -85,3 +86,6 @@ def main():
 
     main_elapsed = perf_counter() - main_start
     print(f"Total time elapsed: {main_elapsed:0.2f} seconds")
+
+if __name__ == "__main__":
+    main()

@@ -59,6 +59,7 @@ def get_nyse_date_tups(start: str, end: str = 'today', unix=False) -> List[Tuple
 
 def estimate_time(n_requests: int, rps: float = 10, req_time: float = 1):
     """Estimate time for API calls."""
+    assert isinstance(n_requests, int), "n_requests must be an integer"
     total_time_seconds = (n_requests / rps) + req_time # Calculate the total time in seconds
     hours, remainder = divmod(int(total_time_seconds), 3600) # Convert the total time to HH:MM:SS format
     minutes, seconds = divmod(remainder, 60)

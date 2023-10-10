@@ -1,7 +1,8 @@
 import pandas as pd
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Dict
 
 from lib.utils import get_polygon_key
+from lib.models import Snapshot
 
 def make_url(ticker, start, end, limit=1000, adjusted=True, api_key=get_polygon_key()):
     """Make a url for polygon API call."""
@@ -36,3 +37,22 @@ def make_urls(tickers: Union[List[str], str], tups: [Tuple[str, str]], flatten=T
     # if len(tickers) == 1: urls = urls[0] # if only one ticker, flatten list to avoid nested list [[data]] -> [data]
     assert len(urls) == len(tickers) * len(tups), "urls should be the same length as tickers * tups"
     return urls
+
+def validate_results(results : List[Dict]) -> Tuple[List[Snapshot], List[Dict]]:
+    """
+    Validate results from polygon API call via the Snapshot model.
+    Returns a list of validated results (pydantic snapshot objects) and a list of invalidated results (raw reponse dicts from the API)
+    """
+    validated_results = []
+    invalidated_results = []
+    for result in results:
+        try:
+            validated_result = Snapshot(**result)
+            validated_results.append(validated_result)
+        except Exception as e:
+            invalidated_result = result
+            invalidated_results.append(invalidated_result)
+
+    print(f'Validated: {len(validated_results)}')
+    print(f'Invalidated: {len(invalidated_results)}')
+    return validated_results, invalidated_results
