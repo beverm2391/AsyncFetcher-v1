@@ -7,6 +7,8 @@ def make_url(ticker, start, end, limit=1000, adjusted=True, api_key=get_polygon_
     """Make a url for polygon API call."""
 
     assert api_key is not None, "api_key must be provided"
+    assert isinstance(ticker, str), "ticker must be a string"
+
     base_url = "https://api.polygon.io/v2/aggs/ticker/"
     adj = 'true' if adjusted else 'false'
     url = f"{base_url}{ticker}/range/1/minute/{start}/{end}?adjusted={adj}&sort=asc&limit={limit}&apiKey={api_key}"
@@ -14,9 +16,12 @@ def make_url(ticker, start, end, limit=1000, adjusted=True, api_key=get_polygon_
 
 def validate(tickers: Union[List[str], str]) -> List[str]:
     """Validate tickers list."""
-
     if isinstance(tickers, str): tickers = [tickers] # make sure tickers is a list
-    assert len(tickers) > 0, "list of tickers must be non-empty" # make sure tickers is non-empty
+
+    assert isinstance(tickers, list), "tickers must be a list of strings"
+    assert len(tickers) > 0, "list of tickers must be non-empty (and non null)" # make sure tickers is non-empty
+    assert all([isinstance(ticker, str) for ticker in tickers]), "tickers must be a list of strings" # make sure tickers is a list of strings
+
     return tickers
 
 def make_urls(tickers: Union[List[str], str], tups: [Tuple[str, str]], flatten=True):
