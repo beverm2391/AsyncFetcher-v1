@@ -1,15 +1,12 @@
 import pandas as pd
-from typing import List, Dict, Any, Optional, Tuple, Union
-import os
+from typing import List, Dict
 from time import perf_counter
-from pathlib import Path
 import pickle
 from datetime import datetime
 
 from lib.utils import get_polygon_root, get_93, get_polygon_key, get_nyse_date_tups, estimate_time, validate_path
 from lib.fetcher import HttpRequestFetcher, BatchRequestExecutor
 from lib.polygon import make_urls, validate_results
-from lib.models import Snapshot
 
 def save_tickers(concat_df: pd.DataFrame, start: str, end: str, base_path=get_polygon_root()):
     """
@@ -53,15 +50,16 @@ def main():
     # input params
     # TODO setup argparse
 
-    tickers_ = tickers[:20]
-    # start_date = '2018-10-11'
-    start_date = '2023-09-09'
+    # tickers_ = tickers[:20]
+    tickers_ = 'AAPL'
+    start_date = '2018-10-11'
+    # start_date = '2023-09-09' # test date
     end_date = '2023-10-09'
 
     tups = get_nyse_date_tups(start_date, end_date, unix=True) # get tups of open/close, unix
     urls = make_urls(tickers_, tups, api_key) # make urls
 
-    REQUESTS_PER_SECOND = 100 
+    REQUESTS_PER_SECOND = 500
 
     fetcher = HttpRequestFetcher(rps=REQUESTS_PER_SECOND, detailed_logs=True) # setup fetcher
     executor = BatchRequestExecutor() # setup executor
