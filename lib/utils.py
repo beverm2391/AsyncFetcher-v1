@@ -46,17 +46,17 @@ def get_nyse_date_tups(start: str, end: str = 'today', time_detail=True) -> List
     decode_str = "%Y-%m-%d %H:%M:%S" if time_detail else "%Y-%m-%d" # decode str
     func = lambda x: pd.to_datetime(x, utc=True).tz_convert('America/New_York').strftime(decode_str) # convert to nyse tz
     tups = [(func(a), func(b)) for a, b in zip(nyse['market_open'], nyse['market_close'])] # get tups of open/close, formatted with func
+    assert tups is not None and len(tups) > 0, "tups must be non-empty. you probably provided dates that are not NYSE trading days."
     return tups
 
 # ! API Utils =====================================================================
 
-def estimate_time(urls, rps=10, req_time=1):
+def estimate_time(n_requests: int, rps: float = 10, req_time: float = 1):
     """Estimate time for API calls."""
-    n_urls = sum([len(url) for url in urls]) # Get the total number of urls
-    total_time_seconds = (n_urls / rps) * req_time # Calculate the total time in seconds
+    total_time_seconds = (n_requests / rps) * req_time # Calculate the total time in seconds
     hours, remainder = divmod(int(total_time_seconds), 3600) # Convert the total time to HH:MM:SS format
     minutes, seconds = divmod(remainder, 60)
-    print(f"Estimated time for {n_urls} requests @ {req_time}s per API call: {hours:02d}:{minutes:02d}:{seconds:02d}")
+    print(f"Estimated time for {n_requests} requests @ {req_time}s per API call: {hours:02d}:{minutes:02d}:{seconds:02d}")
 
 # ! Decorators =====================================================================
 def try_it(func):

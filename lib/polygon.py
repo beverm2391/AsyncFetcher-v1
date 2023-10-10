@@ -34,5 +34,5 @@ def make_urls(tickers: Union[List[str], str], tups: [Tuple[str, str]], flatten=T
     
     if flatten: urls = [url for sublist in urls for url in sublist] # flatten all tickers into one list
     # if len(tickers) == 1: urls = urls[0] # if only one ticker, flatten list to avoid nested list [[data]] -> [data]
-
+    assert len(urls) == len(tickers) * len(tups), "urls should be the same length as tickers * tups"
     return urls

@@ -8,11 +8,12 @@ This is my asynchronous fetcher with rate limiting. It's a work in progress - I'
 - [X] get the fetcher working in notebook
 - [X] create a Pydantic schema for the polygon response
 - [X] move url generation logic to library
+- [X] finish test_utils
+- [X] finish test_polygon
 
 ## TODO 
-- [ ] finish test_utils
-- [ ] finith test_polygon
 - [ ] write fetcher script from `polygon_v1.ipynb` notebook
-- [ ] do some stress testing of polygon API??
+- [ ] do some *light* stress testing of polygon API??
 - [ ] fetch 5 years worth of minute data for the 93 stocks (07-01-2011 - 06-30-2021)
+- [ ] add tqdm or something to show progress and overall rate metrics?
 - [ ] use that data to replicate the results of the paper
