@@ -10,6 +10,7 @@ This is my asynchronous fetcher with rate limiting. It's a work in progress - I'
 - [X] move url generation logic to library
 - [X] finish test_utils
 - [X] finish test_polygon
+- [X] fix tuple generator to use only date string or unix timestamp
 
 ## TODO 
 - [ ] write fetcher script from `polygon_v1.ipynb` notebook
@@ -17,4 +18,5 @@ This is my asynchronous fetcher with rate limiting. It's a work in progress - I'
 - [ ] do some *light* stress testing of polygon API??
 - [ ] fetch 5 years worth of minute data for the 93 stocks (07-01-2011 - 06-30-2021)
 - [ ] add tqdm or something to show progress and overall rate metrics?
+- [ ] improve the fetcher where you can cancel a run and still have the data you've fetched so far
 - [ ] use that data to replicate the results of the paper
