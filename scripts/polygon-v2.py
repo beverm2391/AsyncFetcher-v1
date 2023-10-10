@@ -3,24 +3,25 @@ from typing import List, Dict, Any, Optional, Tuple, Union
 import os
 from time import perf_counter
 from pathlib import Path
+import pickle
+from datetime import datetime
 
-from lib.utils import get_polygon_root, get_93, get_polygon_key, get_nyse_date_tups, estimate_time
+from lib.utils import get_polygon_root, get_93, get_polygon_key, get_nyse_date_tups, estimate_time, validate_path
 from lib.fetcher import HttpRequestFetcher, BatchRequestExecutor
-from lib.polygon import make_urls
+from lib.polygon import make_urls, validate_results
 from lib.models import Snapshot
 
-def save_tickers(concat_df: pd.DataFrame, start: str, end: str, filetype: str = 'csv', base_path=get_polygon_root()):
+def save_tickers(concat_df: pd.DataFrame, start: str, end: str, base_path=get_polygon_root()):
     """
     Saves a df with any number of unique tickers to separate csvs
     """
 
-    base_path = Path(base_path)
-    base_path.mkdir(parents=True, exist_ok=True)
+    validate_path(base_path) # validate path (create if doesn't exist)
+    validate_path(f"{base_path}/raw") # validate path (create if doesn't exist)
 
     def _save(df: pd.DataFrame, ticker, start: str, end: str):
         """Saves a single df to csv"""
-        path = f"{base_path}/raw/{ticker}-{start}-{end}.pkl"
-        if not os.path.exists(path): os.mkdir(path)
+        path = f"{base_path}/raw/{ticker}-{start}-{end}.csv"
         df.to_csv(path)
         print("Saved results to csv")
 
@@ -30,12 +31,18 @@ def save_tickers(concat_df: pd.DataFrame, start: str, end: str, filetype: str = 
         _save(concat_df, ticker, start, end)
     else:
         print("Saving multiple tickers...")
-        df_ticker_tups = [(df, ticker) for df, ticker in concat_df.groupby(by='ticker')] # groupby ticker
-        df_ticker_tups = [df.reset_index(drop=True) for df, ticker in df_ticker_tups] # reset index
-        for (df, ticker), idx in enumerate(df_ticker_tups):
-            print(f"Saving {ticker}... {idx+ 1} / {len(df_ticker_tups)}")
+        df_ticker_tups = [(df.reset_index(drop=True), ticker) for ticker, df in concat_df.groupby('ticker')] # groupby ticker
+        for idx, (df, ticker) in enumerate(df_ticker_tups):
+            print(f"Saving {ticker}... {idx+ 1} of {len(df_ticker_tups)}")
             _save(df, ticker, start, end)
 
+def save_invalidated_results(invalidated_results: List[Dict], base_path=get_polygon_root()):
+    """
+    Saves a list of invalidated results to a pickle file
+    """
+    validate_path(base_path) # validate path (create if doesn't exist)
+    with open(f"{base_path}/invalidated_run_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pkl", 'wb') as f:
+        pickle.dump(invalidated_results, f)
 
 def main():
     main_start = perf_counter()
@@ -68,21 +75,33 @@ def main():
     print(f"Data fetching complete. Time elapsed: {fetch_elapsed:0.2f} seconds")
     print("Validating and parsing data...")
 
-    validated = [Snapshot(**result) for result in results] # validate
+    validated, invalidated = validate_results(results) # validate
 
-    # load into dataframe
-    df = pd.DataFrame([
-        {
-            **result.model_dump(),
-            'ticker': snapshot.ticker
-        }
-        for snapshot in validated for result in snapshot.results])
-    
-    # save to csv
-    print("Saving data...")
+    # ! Handle validated results
+    if len(validated) > 0:
+        # load valid results into dataframe
+        df = pd.DataFrame([
+            {
+                **result.model_dump(),
+                'ticker': snapshot.ticker
+            }
+            for snapshot in validated for result in snapshot.results])
+        
+        # save to csv
+        print("Saving validated data...")
 
-    save_dir = "/Users/beneverman/Documents/Coding/AsyncFetcher-v1/data/tests"
-    save_tickers(df, start_date, end_date, base_path=save_dir)
+        save_dir = "/Users/beneverman/Documents/Coding/AsyncFetcher-v1/data/tests"
+        save_tickers(df, start_date, end_date, base_path=save_dir)
+    else:
+        print("No validated results to save. RIP :(")
+
+    # ! Handle invalidated results
+    if len(invalidated) > 0:
+        # pickle invalid results
+        print("Saving invalidated data...")
+        save_invalidated_results(invalidated, base_path=save_dir)
+    else:
+        print("No invalidated results to save. Nice!")
 
     main_elapsed = perf_counter() - main_start
     print(f"Total time elapsed: {main_elapsed:0.2f} seconds")

@@ -2,6 +2,7 @@ import pandas as pd
 from functools import lru_cache, wraps
 from dotenv import load_dotenv
 import os
+from pathlib import Path
 import pandas_market_calendars as mcal
 from typing import List, Tuple, Union
 
@@ -27,6 +28,10 @@ def get_sp500():
 def get_93():
     """Returns the 93 stocks included in the Oxford IV Paper"""
     return ['AAPL','ACN','ADBE','ADP','AVGO','CRM','CSCO','FIS','FISV','IBM','INTC','INTU','MA','MSFT','MU','NVDA','ORCL','QCOM','TXN','V','ABT','AMGN','BDX','BMY','BSX','CI','CVS','DHR','GILD','ISRG','JNJ','LLY','MDT','MRK','PFE','SYK','TMO','UNH','VRTX','AXP','BAC','BLK','BRK.B','C','CB','CME','GS','JPM','MMC','MS','PNC','SCHW','USB','WFC','BA','CAT','CSX','GE','HON','LMT','MMM','UNP','UPS','AMZN','HD','LOW','MCD','NKE','SBUX','TGT','TJX','CL','COST','KO','MO','PEP','PG','PM','WMT','CMCSA','DIS','GOOG','NFLX','T','VZ','AMT','CCI','COP','CVX','D','DUK','SO','XOM']
+
+def validate_path(path: str):
+    path = Path(path)
+    path.mkdir(parents=True, exist_ok=True)
 
 # ! Market Utils =====================================================================
 def get_nyse_calendar(start: str, end: str) -> pd.DataFrame:
