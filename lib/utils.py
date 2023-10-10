@@ -3,6 +3,7 @@ from functools import lru_cache, wraps
 from dotenv import load_dotenv
 import os
 import pandas_market_calendars as mcal
+from typing import List, Tuple, Union
 
 # ! Polygon ================================================================
 def get_polygon_root() -> str:
@@ -27,11 +28,27 @@ def get_93():
     """Returns the 93 stocks included in the Oxford IV Paper"""
     return ['AAPL','ACN','ADBE','ADP','AVGO','CRM','CSCO','FIS','FISV','IBM','INTC','INTU','MA','MSFT','MU','NVDA','ORCL','QCOM','TXN','V','ABT','AMGN','BDX','BMY','BSX','CI','CVS','DHR','GILD','ISRG','JNJ','LLY','MDT','MRK','PFE','SYK','TMO','UNH','VRTX','AXP','BAC','BLK','BRK.B','C','CB','CME','GS','JPM','MMC','MS','PNC','SCHW','USB','WFC','BA','CAT','CSX','GE','HON','LMT','MMM','UNP','UPS','AMZN','HD','LOW','MCD','NKE','SBUX','TGT','TJX','CL','COST','KO','MO','PEP','PG','PM','WMT','CMCSA','DIS','GOOG','NFLX','T','VZ','AMT','CCI','COP','CVX','D','DUK','SO','XOM']
 
-# ! Other Utils =====================================================================
+# ! Market Utils =====================================================================
 def get_nyse_calendar(start: str, end: str) -> pd.DataFrame:
     """Returns a dataframe of the NYSE calendar."""
     nyse = mcal.get_calendar('NYSE')
     return nyse.schedule(start_date=start, end_date=end)
+
+def get_nyse_date_tups(start: str, end: str = 'today', time_detail=True) -> List[Tuple[str, str]]:
+    """
+    Get a list of tuples of (open, close) datetimes for NYSE trading days between start and end dates.
+    """
+    if end == 'today': end = pd.Timestamp.now().strftime('%Y-%m-%d') # get today! 
+    assert pd.Timestamp(start) < pd.Timestamp(end), "start date must be before end date"
+
+    nyse = get_nyse_calendar(start, end) # get nyse calendar
+
+    decode_str = "%Y-%m-%d %H:%M:%S" if time_detail else "%Y-%m-%d" # decode str
+    func = lambda x: pd.to_datetime(x, utc=True).tz_convert('America/New_York').strftime(decode_str) # convert to nyse tz
+    tups = [(func(a), func(b)) for a, b in zip(nyse['market_open'], nyse['market_close'])] # get tups of open/close, formatted with func
+    return tups
+
+# ! API Utils =====================================================================
 
 def estimate_time(urls, rps=10, req_time=1):
     """Estimate time for API calls."""

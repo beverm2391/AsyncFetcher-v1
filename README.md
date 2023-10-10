@@ -7,9 +7,11 @@ This is my asynchronous fetcher with rate limiting. It's a work in progress - I'
 - [X] figure out whats wrong with  my code in `polygon_v1.ipynb` notebook - when passing in a list of 1 ticker it outputs 4 lists of urls - might be the list comp
 - [X] get the fetcher working in notebook
 - [X] create a Pydantic schema for the polygon response
+- [X] move url generation logic to library
 
 ## TODO 
-- [ ] move url generation logic to library, write unit tests
+- [ ] finish test_utils
+- [ ] finith test_polygon
 - [ ] write fetcher script from `polygon_v1.ipynb` notebook
 - [ ] do some stress testing of polygon API??
 - [ ] fetch 5 years worth of minute data for the 93 stocks (07-01-2011 - 06-30-2021)
