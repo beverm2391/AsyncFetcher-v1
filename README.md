@@ -1,6 +1,11 @@
-This is my asynchronous fetcher with rate limiting. It's a work in progress - I'm primarily using it to fetch large amounts of stock data form polygon.io without pagination. If i need 20k results and the pagination limit is 1k, thats 20 separate, synchronous API calls - at 2s/call thats a minimum of 40s. Instead, I can make 20 asynchronous calls at once and get the data in 2s. Now scale that up to 800ish results per call (minute data for a day for one ticker) * 252 trading days a year * 10 years * 503 stocks in the S&P 500 = 1,267,560 API calls. With pagination (assuming 2s per call) that would amount to 704.2 hours. (This is assuming that all 503 stocks have been listed for 10 years, which is not true), but you get the idea of an IO bound process.
+## AcychFetcher-v1 AKA Polygon Mega Fetcher
 
-Did a successful run with AAPL. Fetched, validated, parsed, and saved 5 years of minute date (~500k rows) in 10.08s! Nice!
+This is my asynchronous fetcher with rate limiting (concurrency control). It's a work in progress - I'm primarily using it to fetch large amounts of stock data form polygon.io without pagination.
+
+I needed to fetch 1256 days (5yrs) * 93 tickers or minute data to build a dataset in a reasonable amount of time. Using Polygon's pagination (more than 1000 results) creates an I/O bottleneck. Say each request takes ~1s to return with the link for the next request, and assuming ~800 results a day, we'll round up and estimate 1 request per day, per stock. That amounts to 116,808 sychronous API calls @ ~1s per call = ~32.45 hours. The natural solution is to make batches of smaller calls (less than the pagination limit of 1k) asychronously. That's why I built this fetcher, which sends batch GET requests while handling errors with exponential backoff and adhering to a global concurrency limit.
+
+For a single stock (AAPL), I fetched, validated, parsed, and saved 5 years of minute date (~480k rows) in 10.08s! Nice!
+I ended up getting all 93 stocks in under an hour. Since each stock had about 480k rows, my total dataset was about 44.6 million rows. 
 
 ## Completed
 - [X] fix rate limiter and get test passing
