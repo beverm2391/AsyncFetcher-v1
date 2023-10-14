@@ -6,7 +6,7 @@ I needed to fetch 1256 days (5yrs) * 93 tickers or minute data to build a datase
 
 Say each request takes ~1s to return with the link for the next request, and assuming ~800 results a day, we'll round up and estimate 1 request per day, per stock. That amounts to 116,808 sychronous API calls @ ~1s per call = ~32.45 hours. 
 
-The natural solution is to make batches of smaller calls (less than the pagination limit of 1k) asychronously. That's why I built this fetcher, which sends batch GET requests while handling errors with exponential backoff and adhering to a global concurrency limit.
+The natural solution is to make batches of smaller calls (less than the pagination limit of 1k) asychronously. That's why I built this fetcher, which sends batch GET requests while handling errors with exponential backoff and adhering to a global concurrency limit. 
 
 For a single stock (AAPL), I fetched, validated, parsed, and saved 5 years of minute date (~480k rows) in 10.08s! Nice!
 I ended up getting all 93 stocks in under an hour. Since each stock had about 480k rows, my total dataset was about 44.6 million rows. 
