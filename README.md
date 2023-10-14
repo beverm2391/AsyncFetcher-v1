@@ -2,7 +2,7 @@
 
 This is my asynchronous fetcher with rate limiting (concurrency control). It's a work in progress - I'm primarily using it to fetch large amounts of stock data form polygon.io without pagination.
 
-I needed to fetch 1256 days (5yrs) * 93 tickers or minute data to build a dataset in a reasonable amount of time. Using Polygon's pagination (more than 1000 results) creates an I/O bottleneck. 
+I needed to fetch 1256 days (5yrs) * 93 tickers of minute data in a reasonable amount of time to build a dataset. Using Polygon's pagination (more than 1000 results returns a link with the next page) creates an I/O bottleneck. 
 
 Say each request takes ~1s to return with the link for the next request, and assuming ~800 results a day, we'll round up and estimate 1 request per day, per stock. That amounts to 116,808 sychronous API calls @ ~1s per call = ~32.45 hours. 
 
