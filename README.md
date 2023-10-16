@@ -27,10 +27,11 @@ I ended up getting all 93 stocks in under an hour. Since each stock had about 48
 - [X] do some *light* stress testing of polygon API??
 - [X] make new script to do one ticker at a time, aggregate, and write to csv, so that if something breaks I don't lose everything 
 - [X] fetch 5 years worth of minute data for the 93 stocks (07-01-2011 - 06-30-2021)
-- 
+
 ## TODO 
 - [ ] get repo ready for other people to use
   - [ ] add requirements.txt
+  - [ ] figure out the best convention for python packaging for community ease of use and package maintenance
   - [ ] add setup.py (figure out how to install the package)
   - [ ] add docs and example scripts
 - [ ] add tqdm or something to show progress and overall rate metrics?
