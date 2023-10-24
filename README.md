@@ -32,7 +32,9 @@ I ended up getting all 93 stocks in under an hour. Since each stock had about 48
 - [ ] get repo ready for other people to use
   - [ ] add requirements.txt
   - [ ] figure out the best convention for python packaging for community ease of use and package maintenance
+    - [ ] find a good package to copy/use as reference
   - [ ] add setup.py (figure out how to install the package)
   - [ ] add docs and example scripts
+  - [ ] get friends (leafboats) to test out the package/workflow
 - [ ] add tqdm or something to show progress and overall rate metrics?
 - [ ] improve the fetcher where you can cancel a run and still have the data you've fetched so far (like a cache?)
